@@ -1,0 +1,120 @@
+<% layout("./Layouts/boilerplate") %>
+<script>
+  let mapToken = "<%= process.env.MAP_TOKEN  %>"
+  let listing = <%- JSON.stringify(ShowListing) %>
+</script>
+
+<body>
+  <div class="row mt-3">
+    <div class="col-8 offset-3">
+      <h3><b><%= ShowListing.title %></b></h3>
+    </div>
+  </div>
+  <div class="card listing-card mt-2 col-6 offset-3">
+    <img
+      src="<%= ShowListing.image.url %>"
+      class="card-img-top show-image col-6"
+      alt="listing-image"
+    />
+    <div class="card-body">
+      <p class="card-text">
+        <br>
+        <%= ShowListing.owner.username %>
+        <br />
+        <%= ShowListing.description %>
+        <br />
+        &#36;<%= ShowListing.price %>
+        <br />
+        <%= ShowListing.country %>
+        <br />
+        <%= ShowListing.location %>
+      </p>
+    </div>
+  </div>
+  <div class="btns mb-3 offset-3">
+    <a
+      href="/listings/<%= ShowListing._id %>/edit"
+      class="btn btn-dark edit-btn"
+      >Edit
+    </a>
+
+    <form
+      method="POST"
+      action="/listings/<%= ShowListing._id %>?_method=DELETE"
+    >
+      <button class="btn btn-dark offset-2">Delete</button>
+    </form>
+  </div>
+  <div class="col-6 offset-3 mt-3">
+    <hr>
+    <h3>Leave A Review</h3>
+    <form method="POST" action="/listings/<%= ShowListing._id %>/review" novalidate class="needs-validation">
+      <div class="mb-3">
+        <label for="rating" class="form-label">Rating</label>
+        <fieldset class="starability-slot offset-5">
+          <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
+          <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+          <label for="first-rate1" title="Terrible">1 star</label>
+          <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+          <label for="first-rate2" title="Not good">2 stars</label>
+          <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+          <label for="first-rate3" title="Average">3 stars</label>
+          <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+          <label for="first-rate4" title="Very good">4 stars</label>
+          <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+          <label for="first-rate5" title="Amazing">5 stars</label>
+        </fieldset>
+      </div>
+      <div class="mb-3">
+        <label for="comment" class="form-label">Comment</label>
+        <textarea
+          rows="5"
+          type="text"
+          id="comment"
+          name="review[comment]"
+          class="form-control"
+          required
+        ></textarea>
+        <div class="invalid-feedback">
+          Add comment to submit a review
+        </div>
+      </div>
+      
+      <button class="btn btn-primary">Submit</button>
+    </form>
+    <hr>
+    <div class="row">
+      <% if (ShowListing.reviews.length == 0) {%>
+        <div class="mb-0">
+          <div class="card-body mb-0 ms-1">
+            <h6><b>No Reviews Yet.</b></h6>
+          </div>
+        </div>
+        <% } %>
+        <% if (ShowListing.reviews.length > 0) {%>
+          <h3 class="ms-2 mb-4">All Reviews</h3>
+        <% } %>
+        <% for (review of ShowListing.reviews) {%>
+          <div class="card mb-3 ms-3 col-5 pb-2">
+          <div class="card-body">
+            <p class="card-text"><%= review.comment %></p>
+            <p class="starability-result card-text" data-rating="<%= review.rating %>">
+            </p>
+          </div>
+          <form method="POST" action="/listings/<%= ShowListing._id %>/review/<%= review._id %>?_method=DELETE">
+            <button class="btn btn-sm btn-dark mt-2">Delete</button>
+          </form>
+        </div>
+        <% } %>
+      </div>
+      <hr>
+      </div>
+      <div class="col-6 offset-3 mt-3 mb-5">
+        <h4>Where you'll be</h4>
+        <div id="map"></div>
+      </div>
+        
+</body>
+</body>
+
+<script src="/js/map.js"></script>
