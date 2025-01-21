@@ -27,7 +27,7 @@ module.exports.searchListing = async(req,res)=>{
   
   
   if (listings.length > 0) {
-      res.render("./Listings/searchListing.ejs", {listings});
+      res.render("./Listings/searchlisting.ejs", {listings});
   } else {
     const message = "No Listings Found";
     res.render("./Listings/Error.ejs", { message});
@@ -76,7 +76,14 @@ module.exports.edit = async (req, res) => {
 
 module.exports.updateListing = async (req, res) => {
   const { id } = req.params;
-  let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+  let response = await geoCodingClient
+  .forwardGeocode({
+    query: req.body.listing.location,
+    limit: 1,
+  })
+  .send();
+  let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing});
+  listing.geometry = response.body.features[0].geometry;
   if (typeof req.file !== "undefined") {
     let url = req.file.path;
     let filename = req.file.filename;
